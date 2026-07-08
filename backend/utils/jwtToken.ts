@@ -1,8 +1,10 @@
-export const sendToken = (user, statusCode, res, message) => {
+import { Response } from "express";
+
+export const sendToken = (user: any, statusCode: number, res: Response, message: string) => {
   const token = user.getJWTToken();
   const options = {
     expires: new Date(
-      Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+      Date.now() + parseInt(process.env.COOKIE_EXPIRE || "7", 10) * 24 * 60 * 60 * 1000
     ),
     httpOnly: true, // Set httpOnly to true
   };

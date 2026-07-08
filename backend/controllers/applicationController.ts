@@ -3,8 +3,9 @@ import ErrorHandler from "../middlewares/error.js";
 import { Application } from "../models/applicationSchema.js";
 import { Job } from "../models/jobSchema.js";
 import cloudinary from "cloudinary";
+import { Request, Response, NextFunction } from "express";
 
-export const postApplication = catchAsyncErrors(async (req, res, next) => {
+export const postApplication = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
   const { role } = req.user;
   if (role === "Employer") {
     return next(
@@ -16,7 +17,7 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Resume File Required!", 400));
   }
 
-  const { resume } = req.files;
+  const { resume } = req.files as any;
   const allowedFormats = ["image/png", "image/jpeg", "image/webp"];
   if (!allowedFormats.includes(resume.mimetype)) {
     return next(
@@ -25,7 +26,7 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
   }
   
   try {
-    const cloudinaryResponse = await cloudinary.uploader.upload(
+    const cloudinaryResponse = await cloudinary.v2.uploader.upload(
       resume.tempFilePath
     );
 
@@ -89,7 +90,7 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
       message: "Application Submitted!",
       application,
     });
-  } catch (error) {
+  } catch (error: any) {
     // Handle Cloudinary specific errors+
     if (error.message && error.message.includes("api_key")) {
       console.error("Cloudinary API key error:", error.message);
@@ -102,7 +103,7 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const employerGetAllApplications = catchAsyncErrors(
-  async (req, res, next) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const { role } = req.user;
     if (role === "Job Seeker") {
       return next(
@@ -119,7 +120,7 @@ export const employerGetAllApplications = catchAsyncErrors(
 );
 
 export const jobseekerGetAllApplications = catchAsyncErrors(
-  async (req, res, next) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const { role } = req.user;
     if (role === "Employer") {
       return next(
@@ -136,7 +137,7 @@ export const jobseekerGetAllApplications = catchAsyncErrors(
 );
 
 export const jobseekerDeleteApplication = catchAsyncErrors(
-  async (req, res, next) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const { role } = req.user;
     if (role === "Employer") {
       return next(

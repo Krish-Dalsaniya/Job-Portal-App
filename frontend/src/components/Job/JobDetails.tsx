@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Context } from "../../main";
 const JobDetails = () => {
   const { id } = useParams();
-  const [job, setJob] = useState({});
+  const [job, setJob] = useState<any>({});
   const navigateTo = useNavigate();
 
   const { isAuthorized, user } = useContext(Context);

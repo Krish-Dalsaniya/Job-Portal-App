@@ -1,8 +1,9 @@
 import { catchAsyncErrors } from "../middlewares/catchAsyncError.js";
 import { Job } from "../models/jobSchema.js";
 import ErrorHandler from "../middlewares/error.js";
+import { Request, Response, NextFunction } from "express";
 
-export const getAllJobs = catchAsyncErrors(async (req, res, next) => {
+export const getAllJobs = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
   const jobs = await Job.find({ expired: false });
   res.status(200).json({
     success: true,
@@ -10,7 +11,7 @@ export const getAllJobs = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-export const postJob = catchAsyncErrors(async (req, res, next) => {
+export const postJob = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
   const { role } = req.user;
   if (role === "Job Seeker") {
     return next(
@@ -67,7 +68,7 @@ export const postJob = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-export const getMyJobs = catchAsyncErrors(async (req, res, next) => {
+export const getMyJobs = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
   const { role } = req.user;
   if (role === "Job Seeker") {
     return next(
@@ -81,7 +82,7 @@ export const getMyJobs = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-export const updateJob = catchAsyncErrors(async (req, res, next) => {
+export const updateJob = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
   const { role } = req.user;
   if (role === "Job Seeker") {
     return next(
@@ -104,7 +105,7 @@ export const updateJob = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-export const deleteJob = catchAsyncErrors(async (req, res, next) => {
+export const deleteJob = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
   const { role } = req.user;
   if (role === "Job Seeker") {
     return next(
@@ -123,7 +124,7 @@ export const deleteJob = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-export const getSingleJob = catchAsyncErrors(async (req, res, next) => {
+export const getSingleJob = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   try {
     const job = await Job.findById(id);

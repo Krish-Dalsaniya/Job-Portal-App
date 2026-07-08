@@ -150,7 +150,7 @@ const PostJob = () => {
                   <input
                     type="number"
                     placeholder="Enter Fixed Salary"
-                    value={fixedSalary}
+                    value={fixedSalary as any}
                     onChange={(e) => setFixedSalary(e.target.value)}
                   />
                 ) : (
@@ -172,7 +172,7 @@ const PostJob = () => {
               </div>
             </div>
             <textarea
-              rows="10"
+              rows={10}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Job Description"

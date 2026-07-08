@@ -1,11 +1,14 @@
+import { Request, Response, NextFunction } from "express";
+
 class ErrorHandler extends Error {
-  constructor(message, statusCode) {
+  statusCode: number;
+  constructor(message: string, statusCode: number) {
     super(message);
     this.statusCode = statusCode;
   }
 }
 
-export const errorMiddleware = (err, req, res, next) => {
+export const errorMiddleware = (err: any, req: Request, res: Response, next: NextFunction) => {
   if (typeof err === 'string') {
     return res.status(500).json({
       success: false,

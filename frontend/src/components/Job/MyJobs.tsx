@@ -262,8 +262,8 @@ const MyJobs = () => {
                               editingMode !== element._id ? true : false
                             }
                           >
-                            <option value={true}>TRUE</option>
-                            <option value={false}>FALSE</option>
+                            <option value={"true"}>TRUE</option>
+                            <option value={"false"}>FALSE</option>
                           </select>
                         </div>
                       </div>
