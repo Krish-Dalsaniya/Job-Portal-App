@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
-import { Context } from "../../main";
+import { Context } from "../../Context";
 
 const Application = () => {
   const [name, setName] = useState("");

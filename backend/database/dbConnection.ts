@@ -1,16 +1,16 @@
 import mongoose from "mongoose"; 
 import dotenv from "dotenv"
+import logger from "../utils/logger.js";
 dotenv.config()
-
 
  const dbConnection  = ()=>{
     mongoose.connect(process.env.DB_URL as string,{
        dbName: "Job_Portal"
 
     }).then(()=>{ 
-       console.log("MongoDB Connected Sucessfully !")
+       logger.info("MongoDB Connected Successfully!");
     }).catch((error)=>{
-        console.log(`Failed to connect ${error}`) 
+       logger.error(`Failed to connect to MongoDB: ${error}`);
     })
     
 }

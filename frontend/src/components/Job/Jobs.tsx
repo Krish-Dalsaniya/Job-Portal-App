@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { Context } from "../../main";
+import { Context } from "../../Context";
 
 const Jobs = () => {
   const [jobs, setJobs] = useState<any>({});

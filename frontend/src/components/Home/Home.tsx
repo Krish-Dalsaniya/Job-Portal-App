@@ -1,6 +1,6 @@
 import React from "react";
 import { useContext } from "react";
-import { Context } from "../../main";
+import { Context } from "../../Context";
 import { Navigate } from "react-router-dom";
 import HeroSection from "./HeroSection";
 import HowItWorks from "./HowItWorks";
@@ -13,14 +13,12 @@ const Home = () => {
     return <Navigate to={"/login"} />;
   }
   return (
-    <>
-      <section className="homePage page">
-        <HeroSection />
-        <HowItWorks />
-        <PopularCategories />
-        <PopularCompanies />
-      </section>
-    </>
+    <div className="w-full">
+      <HeroSection />
+      <HowItWorks />
+      <PopularCategories />
+      <PopularCompanies />
+    </div>
   );
 };
 

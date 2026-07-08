@@ -1,102 +1,128 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { RiLock2Fill } from "react-icons/ri";
 import { Link, Navigate } from "react-router-dom";
 import { FaRegUser } from "react-icons/fa";
-import axios from "axios";
 import toast from "react-hot-toast";
-import { Context } from "../../main";
+import { Context } from "../../Context";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { authService } from "../../api/authService";
+
+const loginSchema = z.object({
+  email: z.string().email("Please provide a valid email"),
+  password: z.string().min(1, "Password is required"),
+  role: z.enum(["Job Seeker", "Employer"], { required_error: "Please select a role" }),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const { setIsAuthorized } = useContext(Context);
+  const queryClient = useQueryClient();
 
-  const { isAuthorized, setIsAuthorized } = useContext(Context);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const { data } = await axios.post(
-        "http://localhost:4000/api/v1/user/login",
-        { email, password, role },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+  const mutation = useMutation({
+    mutationFn: authService.login,
+    onSuccess: (data) => {
       toast.success(data.message);
-      setEmail("");
-      setPassword("");
-      setRole("");
       setIsAuthorized(true);
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Login failed");
+    },
+  });
+
+  const onSubmit = (data: LoginFormValues) => {
+    mutation.mutate(data);
   };
 
-  if(isAuthorized){
-    return <Navigate to={'/'}/>
-  }
-
   return (
-    <>
-      <section className="authPage">
-        <div className="container">
-          <div className="header">
-            <img src="/careerconnect-black.png" alt="logo" />
-            <h3>Login to your account</h3>
+    <div className="min-h-screen pt-20 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[100px] -z-10 animate-pulse duration-10000"></div>
+      
+      <div className="w-full max-w-5xl glass-card overflow-hidden flex flex-col md:flex-row shadow-2xl">
+        <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+          <div className="mb-10 text-center md:text-left">
+            <h3 className="text-3xl font-bold tracking-tight mb-2">Welcome Back</h3>
+            <p className="text-muted-foreground">Login to your <span className="text-gradient font-bold">CareerConnect</span> account</p>
           </div>
-          <form>
-            <div className="inputTag">
-              <label>Login As</label>
-              <div>
-                <select value={role} onChange={(e) => setRole(e.target.value)}>
-                  <option value="">Select Role</option>
-                  
-                  <option value="Job Seeker">Job Seeker</option>
-                  <option value="Employer">Employer</option>
+          
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Login As</label>
+              <div className="relative">
+                <select 
+                  {...register("role")}
+                  className="flex h-12 w-full items-center justify-between rounded-xl border border-input bg-background/50 backdrop-blur-sm px-10 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+                >
+                  <option value="" className="text-black">Select Role</option>
+                  <option value="Job Seeker" className="text-black">Job Seeker</option>
+                  <option value="Employer" className="text-black">Employer</option>
                 </select>
-                <FaRegUser />
+                <FaRegUser className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
               </div>
+              {errors.role && <p className="text-sm text-destructive">{errors.role.message}</p>}
             </div>
-            <div className="inputTag">
-              <label>Email Address</label>
-              <div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">Email Address</label>
+              <div className="relative">
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  {...register("email")}
+                  className="flex h-12 w-full rounded-xl border border-input bg-background/50 backdrop-blur-sm px-10 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
                 />
-                <MdOutlineMailOutline />
+                <MdOutlineMailOutline className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg" />
               </div>
+              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
             </div>
-            <div className="inputTag">
-              <label>Password</label>
-              <div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">Password</label>
+              <div className="relative">
                 <input
                   type="password"
                   placeholder="Enter your Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...register("password")}
+                  className="flex h-12 w-full rounded-xl border border-input bg-background/50 backdrop-blur-sm px-10 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
                 />
-                <RiLock2Fill />
+                <RiLock2Fill className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg" />
               </div>
+              {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
             </div>
-            <button type="submit" onClick={handleLogin}>
-              Login
+
+            <button 
+              type="submit" 
+              disabled={mutation.isPending}
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all hover:shadow-lg hover:shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {mutation.isPending ? "Logging in..." : "Login"}
             </button>
-            <Link to={"/register"}>Register Now</Link>
+            
+            <div className="text-center text-sm text-muted-foreground mt-4">
+              Don't have an account? <Link to={"/register"} className="text-primary hover:underline font-medium">Register Now</Link>
+            </div>
           </form>
         </div>
-        <div className="banner">
-          <img src="/login.png" alt="login" />
+        
+        <div className="hidden md:block md:w-1/2 bg-muted/20 relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-blue-500/20 mix-blend-overlay"></div>
+          <img src="/login.png" alt="login" className="w-full h-full object-cover opacity-80 mix-blend-luminosity hover:mix-blend-normal transition-all duration-700" />
         </div>
-      </section>
-    </>
+      </div>
+    </div>
   );
 };
 

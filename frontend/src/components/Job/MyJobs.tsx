@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaCheck } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
-import { Context } from "../../main";
+import { Context } from "../../Context";
 import { useNavigate } from "react-router-dom";
 
 const MyJobs = () => {

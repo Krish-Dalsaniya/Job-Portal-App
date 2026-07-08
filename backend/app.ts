@@ -8,9 +8,22 @@ import cors from "cors";
 import { errorMiddleware } from "./middlewares/error.js";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import logger from "./utils/logger.js";
 
 const app = express();
 config({ path: "./config/config.env" });
+
+// Security Middlewares
+app.use(helmet());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  message: "Too many requests from this IP, please try again after 15 minutes",
+});
+app.use("/api", limiter);
 
 app.use(
   cors({

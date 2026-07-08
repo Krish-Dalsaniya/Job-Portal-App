@@ -6,10 +6,12 @@ import {
   postApplication,
 } from "../controllers/applicationController.js";
 import { isAuthenticated } from "../middlewares/auth.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { applicationPostSchema } from "../schemas/applicationValidation.js";
 
 const router = express.Router();
 
-router.post("/post", isAuthenticated, postApplication);
+router.post("/post", isAuthenticated, validateRequest(applicationPostSchema), postApplication);
 router.get("/employer/getall", isAuthenticated, employerGetAllApplications);
 router.get("/jobseeker/getall", isAuthenticated, jobseekerGetAllApplications);
 router.delete("/delete/:id", isAuthenticated, jobseekerDeleteApplication);

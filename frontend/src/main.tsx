@@ -1,36 +1,28 @@
-import React, { createContext, useState } from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Context } from "./Context";
 
-interface AppContext {
-  isAuthorized: boolean;
-  setIsAuthorized: React.Dispatch<React.SetStateAction<boolean>>;
-  user: any;
-  setUser: React.Dispatch<React.SetStateAction<any>>;
-}
-
-export const Context = createContext<AppContext>({
-  isAuthorized: false,
-  setIsAuthorized: () => {},
-  user: {},
-  setUser: () => {},
-});
+const queryClient = new QueryClient();
 
 const AppWrapper = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [user, setUser] = useState({});
 
   return (
-    <Context.Provider
-      value={{
-        isAuthorized,
-        setIsAuthorized,
-        user,
-        setUser,
-      }}
-    >
-      <App />
-    </Context.Provider>
+    <QueryClientProvider client={queryClient}>
+      <Context.Provider
+        value={{
+          isAuthorized,
+          setIsAuthorized,
+          user,
+          setUser,
+        }}
+      >
+        <App />
+      </Context.Provider>
+    </QueryClientProvider>
   );
 };
 
